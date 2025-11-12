@@ -26,7 +26,7 @@ jobs:
  
       - name: Create PR from current branch to workflow (no temp branch)
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           # Skip if a PR from this branch to workflow already exists
           if gh pr view --head "${{ github.ref_name }}" --base workflow >/dev/null 2>&1; then
