@@ -1,39 +1,38 @@
 name: PR to workflow on otel* changes
- 
+
 permissions:
   contents: read
   pull-requests: write
- 
+
 on:
   push:
     branches:
-      - source_otel        # set to the branch where this workflow lives
+      - source_otel
     paths:
-      - 'otel*'                 # matches files starting with "otel" in the current branch
- 
+      - 'otel*'
+
 concurrency:
   group: pr-from-${{ github.ref }}
   cancel-in-progress: false
- 
+
 jobs:
   open-pr:
-    if: ${{ github.ref != 'refs/heads/workflow' }}   # safety: don't PR from workflow to workflow that is,  Only run this job if the workflow was triggered from a branch other than workflow.
+    if: ${{ github.ref != 'refs/heads/workflow' }}
     runs-on: ubuntu-latest
- 
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
- 
+
       - name: Create PR from current branch to workflow (no temp branch)
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}  # Use PAT instead of default token
         run: |
-          # Skip if a PR from this branch to workflow already exists
           if gh pr view --head "${{ github.ref_name }}" --base workflow >/dev/null 2>&1; then
             echo "PR already exists from ${{ github.ref_name }} to workflow. Skipping."
             exit 0
           fi
- 
+
           gh pr create \
             --base workflow \
             --head "${{ github.ref_name }}" \
